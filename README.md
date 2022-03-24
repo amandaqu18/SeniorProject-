@@ -22,7 +22,7 @@ Description: A BLE/Wi-Fi mesh network utilizing four ESP 32 Gateway clients that
 
 
 #### Completed Tasks ####
-✅ Diagram 
-✅ Read Me file
-✅ GitHub page
+✅ Diagram <br/>
+✅ Read Me file <br/>
+✅ GitHub page <br/>
 ✅ 1/8 devices
