@@ -19,3 +19,10 @@ Description: A BLE/Wi-Fi mesh network utilizing four ESP 32 Gateway clients that
 **Nikolai**
 * ESP access point
 * Chart with data
+
+
+#### Completed Tasks ####
+- [x] Diagram 
+- [x] Read Me file
+- [x] GitHub page
+- [x] 1/8 devices
