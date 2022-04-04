@@ -7,71 +7,106 @@
 #include "rpcWiFi.h"
 #include <Seeed_Arduino_FS.h>
 #include <Seeed_mbedtls.h>
-#include <PubSubClient.h>
+#include <MQTT.h>
+#include <ArduinoJson.h>
 
 #define BEACON_UUID           "8ec76ea3-6668-48da-9866-75be8bc86f4d" // UUID 1
 
+//Wi-Fi
 const char* ssid = "800Shepard";
-const char* password =  "Texas2021";
-
-const char *ID = "Wio-Terminal-Client";  // Name of our device, must be unique
-const char *pubTopic = "myfirst/test";  // Topic to publish to
-const char *subTopic = "mysecond/test";  // Topic to subcribe to
-const char *server = "10.0.0.203"; 
+const char* password = "Texas2021";
 
 WiFiClient wifiClient;
-PubSubClient client(wifiClient);
+MQTTClient MQTTclient;
 
+//MQTT Broker
+const char *ID = "Wio-Terminal-Client";  // Name of our device, must be unique
+const char *pubTopic = "myfirst/test";  // Topic to publish to
+const char *server = "10.0.0.210"; 
+
+StaticJsonDocument<40> doc;
+
+//BLE
 BLEAdvertising *pAdvertising;
 
+//LCD
 TFT_eSPI tft;
 
-void callback(char* topic, byte* payload, unsigned int length) {
+//Connect to the Wi-Fi
 
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i=0;i<length;i++) {
+void connectWifi() {
 
-    Serial.print((char)payload[i]);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi..");
+
+  while (WiFi.status() != WL_CONNECTED) {
+
+    Serial.print(".");
+    delay(1000);
 
   }
 
-  Serial.println();
+  Serial.println("Connected");
+
 }
 
-void reconnect() {
+//Connect to MQTT Broker
 
-  // Loop until we're reconnected
-  while (!client.connected())
-  {
-    Serial.print("Attempting connection...");
-    // Attempt to connect
-    if (client.connect(ID)) {
+void messageReceived(String topic, String payload) {
 
-      Serial.println("connected");
-      // Once connected, publish an announcement...
-      client.publish(pubTopic, "Wio Terminal is connected!");
-      Serial.println("Published connection message successfully!");
-      // ... and resubscribe
-      client.subscribe(subTopic);
+  deserializeJson(doc, payload);
+
+  Serial.println("Message Received:");
+
+  int X = doc["X"];
+  int Y = doc["Y"];
+
+  Serial.print("X: ");
+  Serial.println(X);
+  Serial.print("Y: ");
+  Serial.println(Y);
+
+  tft.fillScreen(TFT_BLACK);
+  tft.fillCircle(X,Y,10,TFT_BLUE);
+
+}
+
+void connectMQTT() {
+
+  MQTTclient.begin(server, wifiClient);
+  MQTTclient.onMessage(messageReceived);
+
+  while (!MQTTclient.connected()) {
+
+    Serial.print("Connecting to MQTT...");
+
+    if (MQTTclient.connect(ID)) {
+
+      Serial.println("Connected");
+
+      MQTTclient.subscribe(pubTopic);
       Serial.print("Subcribed to: ");
-      Serial.println(subTopic);
+      Serial.println(pubTopic);
+
 
     }
     else {
 
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print("failed...");
       Serial.println(" try again in 2 seconds");
-      // Wait 2 seconds before retrying
       delay(2000);
 
     }
   }
 }
 
+//Set the Beacon
+
 void setBeacon() {
+
+  BLEDevice::init("");
+  pAdvertising = BLEDevice::getAdvertising();
 
   BLEBeacon oBeacon = BLEBeacon();
   oBeacon.setManufacturerId(0x4C00); // fake Apple 0x004C LSB (ENDIAN_CHANGE_U16!)
@@ -98,83 +133,44 @@ void setBeacon() {
   pAdvertising->setScanResponseData(oScanResponseData);
   pAdvertising->setAdvertisementType(GAP_ADTYPE_ADV_SCAN_IND);
 
+  pAdvertising->start();
+
 }
 
- void setLCD(){
+//Initilized the LCD Setup
+
+ void initTFT(){
 
   tft.begin();
   tft.fillScreen(TFT_BLACK);
   tft.setRotation(3);
   tft.setTextSize(2);
 
+  tft.fillScreen(TFT_BLACK);
+  tft.fillCircle(160,120,10,TFT_BLUE);
+
  }
  
-
 void setup() {
 
   Serial.begin(115200);
 
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-
-  //Create the BLE Device
-  BLEDevice::init("");
-  pAdvertising = BLEDevice::getAdvertising();
-  //Create Scan
+  //Wifi
+  connectWifi();
+  
+  //Beacon
   setBeacon();
-  // Start advertising
-  pAdvertising->start();
 
-  setLCD();
-
-  tft.setTextColor(TFT_YELLOW);
-  tft.setCursor((320 - tft.textWidth("Connecting to Wi-Fi.."))/2, 100);
-  tft.print("Connecting to Wi-Fi..");
-
-  client.setServer(server, 1883);
-  client.setCallback(callback);
-
+  //MQTT
+  connectMQTT();
+  
+  //TFT
+  initTFT();
 
 }
 
 void loop() {
 
-  //Connect to access point
-  WiFi.begin(ssid, password);
-  if (WiFi.status() != WL_CONNECTED) {
-
-        WiFi.begin(ssid, password);
-
-  }
-
-  tft.fillScreen(TFT_BLACK);
-
-  tft.fillCircle(160,120,20,TFT_BLUE);
-
-  tft.setTextColor(TFT_GREEN);
-  tft.setCursor((320 - tft.textWidth("Connected!"))/2, 80);
-  tft.print("Connected!");
-
-  tft.setTextColor(TFT_WHITE);
-  tft.setCursor((200 - tft.textWidth("IP Address: "))/2, 120);
-  tft.print("IP Address: ");
-  tft.println(WiFi.localIP()); // prints out the device's IP address
-  
-  //Advertise BLE signal 
-  if (WiFi.status() == WL_CONNECTED) {
-
-        pAdvertising->start();
-
-  }
-
-  //Connect to broker
-  if (!client.connected()) {
-
-    reconnect();
-
-  }
-  client.loop();
-
+  MQTTclient.loop();
 
 }
