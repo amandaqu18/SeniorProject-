@@ -21,10 +21,11 @@ MQTTClient MQTTclient;
 
 //MQTT Broker
 const char *ID = "Wio-Terminal-Client";  // Name of our device, must be unique
-const char *pubTopic = "myfirst/test";  // Topic to publish to
+const char *subTopic = "/loc/pos";  // Topic to publish to
 const char *server = "10.0.0.210"; 
 
-StaticJsonDocument<40> doc;
+StaticJsonDocument<40> inDoc;
+StaticJsonDocument<40> outDoc;
 
 //BLE
 BLEAdvertising *pAdvertising;
@@ -55,20 +56,25 @@ void connectWifi() {
 
 void messageReceived(String topic, String payload) {
 
-  deserializeJson(doc, payload);
+  deserializeJson(inDoc, payload);
 
   Serial.println("Message Received:");
 
-  int X = doc["X"];
-  int Y = doc["Y"];
+  int X = inDoc["X"];
+  int Y = inDoc["Y"];
 
   Serial.print("X: ");
   Serial.println(X);
   Serial.print("Y: ");
   Serial.println(Y);
+  Serial.println(WiFi.macAddress());
 
-  tft.fillScreen(TFT_BLACK);
-  tft.fillCircle(X,Y,10,TFT_BLUE);
+  if(WiFi.macAddress() = "2C:F7:F1:1B:B7:1B") {
+
+    tft.fillScreen(TFT_BLACK);
+    tft.fillCircle(X,Y,10,TFT_BLUE);
+
+  }
 
 }
 
@@ -85,9 +91,9 @@ void connectMQTT() {
 
       Serial.println("Connected");
 
-      MQTTclient.subscribe(pubTopic);
+      MQTTclient.subscribe(subTopic);
       Serial.print("Subcribed to: ");
-      Serial.println(pubTopic);
+      Serial.println(subTopic);
 
 
     }
