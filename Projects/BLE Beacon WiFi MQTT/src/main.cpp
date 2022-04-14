@@ -62,14 +62,14 @@ void messageReceived(String topic, String payload) {
 
   int X = inDoc["X"];
   int Y = inDoc["Y"];
+  String MAC = inDoc["MAC"];
 
-  Serial.print("X: ");
   Serial.println(X);
-  Serial.print("Y: ");
   Serial.println(Y);
-  Serial.println(WiFi.macAddress());
+  Serial.println(MAC);
+  Serial.print(WiFi.macAddress());
 
-  if(WiFi.macAddress() = "2C:F7:F1:1B:B7:1B") {
+  if(WiFi.macAddress() = MAC) {
 
     tft.fillScreen(TFT_BLACK);
     tft.fillCircle(X,Y,10,TFT_BLUE);
