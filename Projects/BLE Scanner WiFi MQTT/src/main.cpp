@@ -9,17 +9,17 @@
 #include <MQTT.h>
 
 //WiFi
-const char *ssid = "800Shepard";
-const char *password = "Texas2021"; 
+const char *ssid = "Omega-6CBE";
+const char *password = "123456789"; 
 
 WiFiClient wifiClient;
 MQTTClient MQTTclient;
 
 //MQTT Broker
-const char *ID = "ESP32-Gateway-Client"; //Name of device
+const char *pubTopicInit = "/init"; //Topic to publish to
 const char *pubTopic = "/loc/RSSI/send"; //Topic to publish to
 const char *subTopic = "/loc/RSSI/get"; //Topic to subscribe to
-const char *server = "10.0.0.210"; 
+const char *server = "192.168.3.1"; 
 
 StaticJsonDocument<60> inDoc;
 StaticJsonDocument<120> outDoc;
@@ -118,6 +118,7 @@ void messageReceived(String topic, String payload) {
 
 void connectMQTT() {
 
+  const char *ID = WiFi.macAddress();
   MQTTclient.begin(server, wifiClient);
   MQTTclient.onMessage(messageReceived);
 
@@ -125,9 +126,10 @@ void connectMQTT() {
 
     Serial.print("Connecting to MQTT...");
 
-    if (MQTTclient.connect(ID)) {
+    if (MQTTclient.connect(ID) {
 
       Serial.println("Connected");
+      MQTTclient.publish(pubTopic,"Client Connected");
 
       MQTTclient.subscribe(subTopic);
       Serial.print("Subcribe to: ");

@@ -13,8 +13,8 @@
 #define BEACON_UUID           "8ec76ea3-6668-48da-9866-75be8bc86f4d" // UUID 1
 
 //Wi-Fi
-const char* ssid = "800Shepard";
-const char* password = "Texas2021";
+const char* ssid = "Omega-6CBE";
+const char* password = "123456789";
 
 WiFiClient wifiClient;
 MQTTClient MQTTclient;
@@ -22,7 +22,7 @@ MQTTClient MQTTclient;
 //MQTT Broker
 const char *ID = "Wio-Terminal-Client";  // Name of our device, must be unique
 const char *subTopic = "/loc/pos";  // Topic to publish to
-const char *server = "10.0.0.210"; 
+const char *server = "192.168.3.1"; 
 
 StaticJsonDocument<40> inDoc;
 StaticJsonDocument<40> outDoc;
