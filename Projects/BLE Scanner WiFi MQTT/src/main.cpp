@@ -24,10 +24,8 @@ const char *server = "10.0.0.210";
 StaticJsonDocument<60> inDoc;
 StaticJsonDocument<120> outDoc;
 
-//BLE 
-BLEAddress target("2C:F7:F1:1B:B7:1B");
+//BLE
 int scanTime = 2; 
-int RSSI; //Necessary for most acurate RSSI
 BLEScan* pBLEScan;
 
 
@@ -63,13 +61,27 @@ void setScanner(){
 
 }
 
-// Initate the Scan 
+//Receiving Message
 
-void scan(){
+void messageReceived(String topic, String payload) {
+
+  deserializeJson(inDoc, payload);
+
+  Serial.println("Message Received:");
+
+  const char *MAC = inDoc["MAC"];
+  String ID = inDoc["ID"];
+  BLEAddress target(MAC);
+
+  Serial.println(MAC);
+  Serial.println(ID);
+
+  //Initate the Scan 
 
   Serial.printf("Start BLE scan for %d seconds...\n", scanTime); //Print length of scan
   BLEScanResults foundDevices = pBLEScan->start(scanTime, false); //Starting new scan
   BLEAdvertisedDevice cur; 
+  int RSSI;
  
   for (int i = 0; i < foundDevices.getCount(); i++) { //Cycle through all devices found
       
@@ -88,25 +100,8 @@ void scan(){
   Serial.println("Scan done!");
   pBLEScan->clearResults();   //Delete results fromBLEScan buffer to release memory
 
-}
-
-//Receiving Message
-
-void messageReceived(String topic, String payload) {
-
-  deserializeJson(inDoc, payload);
-
-  Serial.println("Message Received:");
-
-  String MAC = inDoc["MAC"];
-  String ID = inDoc["ID"];
-
-  Serial.println(MAC);
-  Serial.println(ID);
   
   char output[128];
-
-  scan();
 
   outDoc["RSSI"] = RSSI;
   outDoc["MAC"] = MAC;
@@ -135,10 +130,10 @@ void connectMQTT() {
       Serial.println("Connected");
 
       MQTTclient.subscribe(subTopic);
-      Serial.print("Subcribed to: ");
+      Serial.print("Subcribe to: ");
       Serial.println(subTopic);
 
-      Serial.print("Published to: ");
+      Serial.print("Publish to: ");
       Serial.println(pubTopic);
 
     }
