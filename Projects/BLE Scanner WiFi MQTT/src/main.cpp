@@ -129,7 +129,7 @@ void connectMQTT() {
     if (MQTTclient.connect(ID)) {
 
       Serial.println("Connected");
-      MQTTclient.publish(pubTopic, ID);
+      MQTTclient.publish(pubTopicInit, ID);
 
       MQTTclient.subscribe(subTopic);
       Serial.print("Subcribe to: ");
