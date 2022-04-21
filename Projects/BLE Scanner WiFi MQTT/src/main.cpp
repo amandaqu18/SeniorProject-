@@ -118,18 +118,22 @@ void messageReceived(String topic, String payload) {
 
 void connectMQTT() {
 
-  const char *ID = WiFi.macAddress().c_str();
+  char *ident = (char *) WiFi.macAddress().c_str();
+  Serial.println(ident);
   MQTTclient.begin(server, wifiClient);
   MQTTclient.onMessage(messageReceived);
+
+  Serial.println(ident);
 
   while (!MQTTclient.connected()) {
 
     Serial.print("Connecting to MQTT...");
 
-    if (MQTTclient.connect(ID)) {
+    if (MQTTclient.connect(ident)) {
 
       Serial.println("Connected");
-      MQTTclient.publish(pubTopicInit, ID);
+      Serial.println(ident);
+      MQTTclient.publish(pubTopicInit, ident);
 
       MQTTclient.subscribe(subTopic);
       Serial.print("Subcribe to: ");
