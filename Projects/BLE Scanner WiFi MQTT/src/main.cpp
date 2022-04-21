@@ -118,7 +118,7 @@ void messageReceived(String topic, String payload) {
 
 void connectMQTT() {
 
-  const char *ID = WiFi.macAddress();
+  const char *ID = WiFi.macAddress().c_str();
   MQTTclient.begin(server, wifiClient);
   MQTTclient.onMessage(messageReceived);
 
@@ -126,7 +126,7 @@ void connectMQTT() {
 
     Serial.print("Connecting to MQTT...");
 
-    if (MQTTclient.connect(ID) {
+    if (MQTTclient.connect(ID)) {
 
       Serial.println("Connected");
       MQTTclient.publish(pubTopic,"Client Connected");
