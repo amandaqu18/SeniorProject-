@@ -12,7 +12,7 @@
 const char *ssid = "Omega-6CBE";
 const char *password = "123456789"; 
 
-char *ident = (char *) WiFi.macAddress().c_str();
+char ident[20];
 
 WiFiClient wifiClient;
 MQTTClient MQTTclient;
@@ -126,6 +126,8 @@ void connectMQTT() {
   while (!MQTTclient.connected()) {
 
     Serial.print("Connecting to MQTT...");
+    Serial.print(ident);
+    Serial.print("...");
 
     if (MQTTclient.connect(ident)) {
 
@@ -156,6 +158,9 @@ void setup() {
   
   //Wifi
   connectWifi();
+
+  strcpy(ident,WiFi.macAddress().c_str());
+  Serial.println(ident);
 
   //MQTT
   connectMQTT();
