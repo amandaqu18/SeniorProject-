@@ -12,6 +12,8 @@
 const char *ssid = "Omega-6CBE";
 const char *password = "123456789"; 
 
+char *ident = (char *) WiFi.macAddress().c_str();
+
 WiFiClient wifiClient;
 MQTTClient MQTTclient;
 
@@ -25,7 +27,7 @@ StaticJsonDocument<60> inDoc;
 StaticJsonDocument<120> outDoc;
 
 //BLE
-int scanTime = 2; 
+int scanTime = 3; 
 BLEScan* pBLEScan;
 
 
@@ -118,12 +120,8 @@ void messageReceived(String topic, String payload) {
 
 void connectMQTT() {
 
-  char *ident = (char *) WiFi.macAddress().c_str();
-  Serial.println(ident);
   MQTTclient.begin(server, wifiClient);
   MQTTclient.onMessage(messageReceived);
-
-  Serial.println(ident);
 
   while (!MQTTclient.connected()) {
 
@@ -132,7 +130,6 @@ void connectMQTT() {
     if (MQTTclient.connect(ident)) {
 
       Serial.println("Connected");
-      Serial.println(ident);
       MQTTclient.publish(pubTopicInit, ident);
 
       MQTTclient.subscribe(subTopic);
