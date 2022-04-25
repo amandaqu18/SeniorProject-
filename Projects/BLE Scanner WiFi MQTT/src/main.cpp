@@ -9,8 +9,19 @@
 #include <MQTT.h>
 
 //WiFi
-const char *ssid = "Omega-6CBE";
-const char *password = "123456789"; 
+#ifdef OREKHOV
+  const char *ssid = "Omega-6CBE";
+  const char *password = "123456789";
+  const char *server = "192.168.3.1"; 
+#elif BLAKE
+  const char *ssid = "Omega-6CBE";
+  const char *password = "123456789";
+  const char *server = "192.168.3.1"; 
+#else
+  const char *ssid = "Omega-6805"; // Is this correct?
+  const char *password = "123456789";
+  const char *server = "192.168.3.1"; 
+#endif
 
 char ident[20];
 
@@ -21,7 +32,6 @@ MQTTClient MQTTclient;
 const char *pubTopicInit = "/init"; //Topic to publish to
 const char *pubTopic = "/loc/RSSI/send"; //Topic to publish to
 const char *subTopic = "/loc/RSSI/get"; //Topic to subscribe to
-const char *server = "192.168.3.1"; 
 
 StaticJsonDocument<60> inDoc;
 StaticJsonDocument<120> outDoc;
@@ -29,7 +39,6 @@ StaticJsonDocument<120> outDoc;
 //BLE
 int scanTime = 3; 
 BLEScan* pBLEScan;
-
 
 //Connect to the Wi-Fi
 
@@ -59,7 +68,6 @@ void setScanner(){
   pBLEScan->setActiveScan(true); //Active scan uses more power, but get results faster
   pBLEScan->setInterval(100); //Set Scan interval
   pBLEScan->setWindow(99);  //Less or equal setInterval value
-
 
 }
 

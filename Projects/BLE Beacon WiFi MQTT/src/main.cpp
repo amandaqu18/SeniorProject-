@@ -13,7 +13,11 @@
 #define BEACON_UUID           "8ec76ea3-6668-48da-9866-75be8bc86f4d" // UUID 1
 
 //Wi-Fi
-const char *ssid = "Omega-6CBE";
+#ifdef BLAKE
+  const char *ssid = "Omega-6CBE";
+#else
+  const char *ssid = "Omega-6805";
+#endif
 const char *password = "123456789"; 
 
 WiFiClient wifiClient;
