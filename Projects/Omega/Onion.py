@@ -17,18 +17,18 @@ TERMINAL_LOC = "/loc/pos"
 # update to ommega onion
 MQTT_URL = "192.168.3.1"
 MQTT_PORT = 1883
-BROADCAST_INTERVAL = 1
+BROADCAST_INTERVAL = 10
 MEASURED_POWER = -40
 CLIENT_LOCATION = {
     # x, y
-    "id1": [0,0],
-    "id2": [0,20],
-    "id3": [20,0],
-    "id4": [20,20]
+    "34:AB:95:40:50:B0": [0,0],
+    "08:3A:F2:3F:B5:68": [0,20],
+    "08:3A:F2:3F:D7:8C": [20,0],
+    "08:3A:F2:3F:D3:48": [20,20]
 }
 
 RSSI_COMBOS = [[0,1,2], [0,1,3], [0,2,3], [1,2,3]]
-MAC_ADDR = "12:34:56:78:90"
+MAC_ADDR = "2C:F7:F1:1B:B7:1B"
 # END CONSTANTS
 
 # GLOBAL VARIABLES
@@ -50,10 +50,10 @@ def on_message(client, userdata, message):
 
        # if the id isn't equal to the current iter_id then its an
        # old value so discard it
-       if payload['ID'] != iter_id:
+       if payload['ID'] != str(iter_id):
            return False
 
-       rssi_values[payload["CLIENT_ID"]] = payload["RSSI"]
+       rssi_values[payload["Client ID"]] = payload["RSSI"]
 
 def publish(client, topic, payload):
     client.publish(topic,payload, qos=0, retain=False )
@@ -76,6 +76,9 @@ def ask_for_rssi(client):
 
     # wait for the clients to respond
     xy = calculate_location()
+
+    print("RECEIVED:")
+    print(xy)
 
     # only send the location if we have one
     if xy is not None:
