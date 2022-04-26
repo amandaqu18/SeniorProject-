@@ -5,25 +5,18 @@ Description: A system that provides indoor location services utilizing multiple 
  
 
 #### To Do List #####
-**Amanda & Ashley** 
- * Triangulation
-    * Code
-    * Research
- * Development tools on Onion Omega 2+
-    * Python
- * Descriptions 
-    * MQTT usage 
-    * Onion Omega 2+ 
-    * Seed Wio
+**Amanda & Ashley & Nikolai** 
+ * Presentation
+ * Youtube video 
+ * Poster Board & Quad Chart 
 
-
-**Nikolai**
-* ESP access point
-* Chart with data
 
 
 #### Completed Tasks ####
 ✅ Diagram <br/>
 ✅ Read Me file <br/>
 ✅ GitHub page <br/>
-✅ 1/8 devices
+✅ 7/8 devices <br/>
+✅ ESP access point <br/>
+✅ Chart with data <br/>
+✅ Trilateration 
