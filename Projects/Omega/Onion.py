@@ -13,8 +13,9 @@ import paho.mqtt.client as mqtt
 # START CONSTANTS
 RSSI_TOPIC = "/loc/RSSI/get"
 LOCATION_TOPIC = "/loc/RSSI/send"
+TERMINAL_LOC = "/loc/pos"
 # update to ommega onion
-MQTT_URL = "10.115.120.166"
+MQTT_URL = "192.168.3.1"
 MQTT_PORT = 1883
 BROADCAST_INTERVAL = 1
 MEASURED_POWER = -40
@@ -68,7 +69,7 @@ def ask_for_rssi(client):
     # create the json payload to SEND to the clients
     payload = {}
     payload['ID'] = iter_id
-    payload['MAC_ADDR'] = MAC_ADDR
+    payload['MAC'] = MAC_ADDR
 
     # broadcard a request for rssi values
     publish(client, RSSI_TOPIC, json.dumps(payload))
@@ -79,7 +80,12 @@ def ask_for_rssi(client):
     # only send the location if we have one
     if xy is not None:
         # TODO: send the x,y to WT
-        # by caling publixh()
+        # by calling publish()
+        payload = {}
+        payload['X'] = xy[0]
+        payload['Y'] = xy[1]
+        payload['MAC'] = MAC_ADDR
+        publish(client, TERMINAL_LOC, json.dumps(payload))
         print("XY >>>>>>>")
         print(xy)
         rssi_values = {}
@@ -182,4 +188,4 @@ if __name__ == "__main__":
     run()
 
 # what blake needs
-# SS ID, password 
+# SS ID, password
