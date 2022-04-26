@@ -10,9 +10,9 @@
 
 //WiFi
 #ifdef OREKHOV
-  const char *ssid = "Omega-6CBE";
-  const char *password = "123456789";
-  const char *server = "192.168.3.1"; 
+  const char *ssid = "800Shepard";
+  const char *password = "Texas2021";
+  const char *server = "100.0.0.202"; 
 #elif BLAKE
   const char *ssid = "Omega-6CBE";
   const char *password = "123456789";
