@@ -77,15 +77,15 @@ def ask_for_rssi(client):
     # wait for the clients to respond
     xy = calculate_location()
 
-    xy[0] = int((xy[0]/6)*360)
-    xy[1] = int((xy[1]/4)*240)
-
     print("RECEIVED:")
     print(xy)
 
     # only send the location if we have one
     if xy is not None:
         # TODO: send the x,y to WT
+        xy[0] = int((xy[0]/6)*360)
+        xy[1] = int((xy[1]/4)*240)
+
         # by calling publish()
         payload = {}
         payload['X'] = xy[0]
