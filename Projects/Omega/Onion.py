@@ -148,7 +148,7 @@ def calculate_location():
 
 
 def distance(rssi):
-    N = 1
+    N = 3
     distance = 10 ** ((MEASURED_POWER - rssi) / (10 * N))
     return distance
 
