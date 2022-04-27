@@ -165,8 +165,10 @@ def getxy(a,b,c):
   D = 2*c[0] - 2*b[0]
   E = 2*c[1] - 2*b[1]
   F = b[2]**2 - c[2]**2 - b[0]**2 + c[0]**2 - b[1]**2 + c[1]**2
-  x = (C*E - F*B) / (E*A - B*D)
-  y = (C*D - A*F) / (B*D - A*E)
+  G = (C*E - F*B) / (E*A - B*D)
+  H = (C*D - A*F) / (B*D - A*E)
+  x = G*0.3048
+  y = H*0.3048
   return x,y
 
 def run():
