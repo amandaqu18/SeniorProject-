@@ -16,7 +16,7 @@
 #ifdef OREKHOV
   const char *ssid = "800Shepard";
   const char *password = "Texas2021";
-  const char *server = "100.0.0.202"; 
+  const char *server = "10.0.0.202"; 
 #elif BLAKE
   const char *ssid = "Omega-6CBE";
   const char *password = "123456789";

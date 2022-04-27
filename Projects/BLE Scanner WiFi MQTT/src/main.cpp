@@ -12,13 +12,13 @@
 #ifdef OREKHOV
   const char *ssid = "800Shepard";
   const char *password = "Texas2021";
-  const char *server = "100.0.0.202"; 
+  const char *server = "10.0.0.202"; 
 #elif BLAKE
   const char *ssid = "Omega-6CBE";
   const char *password = "123456789";
   const char *server = "192.168.3.1"; 
 #else
-  const char *ssid = "Omega-6805"; // Is this correct?
+  const char *ssid = "Omega-6805"; 
   const char *password = "123456789";
   const char *server = "192.168.3.1"; 
 #endif
@@ -80,7 +80,7 @@ void messageReceived(String topic, String payload) {
   Serial.println("Message Received:");
 
   const char *MAC = inDoc["MAC"];
-  String ID = inDoc["ID"];
+  int ID = inDoc["ID"];
   BLEAddress target(MAC);
 
   Serial.println(MAC);
@@ -111,7 +111,7 @@ void messageReceived(String topic, String payload) {
   pBLEScan->clearResults();   //Delete results fromBLEScan buffer to release memory
 
   
-  char output[128];
+  char output[255];
 
   outDoc["RSSI"] = RSSI;
   outDoc["MAC"] = MAC;
