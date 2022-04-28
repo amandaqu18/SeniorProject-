@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <MQTT.h>
+#include <vector>
 
 //WiFi
 #ifdef OREKHOV
@@ -37,7 +38,7 @@ StaticJsonDocument<60> inDoc;
 StaticJsonDocument<120> outDoc;
 
 //BLE
-int scanTime = 3; 
+int scanTime = 1; 
 BLEScan* pBLEScan;
 
 //Connect to the Wi-Fi
@@ -46,6 +47,8 @@ void connectWifi() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+
+  Serial.println("");
   Serial.print("Connecting to WiFi..");
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -61,7 +64,7 @@ void connectWifi() {
 
 //Set the Scanner
 
-void setScanner(){
+void setScanner() {
 
   BLEDevice::init("");
   pBLEScan = BLEDevice::getScan(); //Create new scan
@@ -77,43 +80,66 @@ void messageReceived(String topic, String payload) {
 
   deserializeJson(inDoc, payload);
 
-  Serial.println("Message Received:");
+  Serial.println("");
+  Serial.println("Message Received");
 
   const char *MAC = inDoc["MAC"];
   int ID = inDoc["ID"];
   BLEAddress target(MAC);
 
-  Serial.println(MAC);
-  Serial.println(ID);
-
   //Initate the Scan 
 
-  Serial.printf("Start BLE scan for %d seconds...\n", scanTime); //Print length of scan
+  std::vector<int> RSSI_VALUES;
+  int length = 0;  
+  int sum = 0;
+  int AVERAGE_RSSI = 0;
+
+  Serial.println("Starting BLE scan for 3 RSSI values...");
+
+  while(length < 3) {
+
   BLEScanResults foundDevices = pBLEScan->start(scanTime, false); //Starting new scan
   BLEAdvertisedDevice cur; 
-  int RSSI;
  
-  for (int i = 0; i < foundDevices.getCount(); i++) { //Cycle through all devices found
+    for (int i = 0; i < foundDevices.getCount(); i++) { //Cycle through all devices found
       
-      cur = foundDevices.getDevice(i); //Current device
+       cur = foundDevices.getDevice(i); //Current device
 
-    if (cur.getAddress().equals(target)) {  //Compare current device adress to target address
-      
-       RSSI = cur.getRSSI();
-       Serial.printf("Address: %s \t RSSI: %d", cur.toString().c_str(), RSSI);
-       Serial.println(); //Print out address, RSSI, and TXPower of found device
-  
+       if (cur.getAddress().equals(target)) {  //Compare current device adress to target address
+
+            Serial.printf("Address: %s, RSSI: %d", cur.toString().c_str(), cur.getRSSI());
+            Serial.println(); //Print out address, RSSI, and TXPower of found device
+            RSSI_VALUES.push_back(cur.getRSSI());
+            length++ ; 
+
+       } 
     } 
-
-  } 
+  }
 
   Serial.println("Scan done!");
   pBLEScan->clearResults();   //Delete results fromBLEScan buffer to release memory
 
-  
-  char output[255];
+  //Get sum of all RSSI values in array
 
-  outDoc["RSSI"] = RSSI;
+  for (int i = 0; i < length; i++) {
+
+      sum += RSSI_VALUES[i];
+
+  } 
+
+  Serial.print("Sum: ");
+  Serial.println(sum);
+
+  //Average sum of RSSI values
+
+  AVERAGE_RSSI =  sum / length;
+
+  Serial.print("Average: ");
+  Serial.println(AVERAGE_RSSI);
+
+  char output[128];
+
+  outDoc["RSSI"] = AVERAGE_RSSI;
   outDoc["MAC"] = MAC;
   outDoc["ID"] = ID;
   outDoc["Client ID"] = WiFi.macAddress();
@@ -121,6 +147,7 @@ void messageReceived(String topic, String payload) {
   serializeJson(outDoc,output);
 
   MQTTclient.publish(pubTopic, output);
+  Serial.println("Message Sent");
 
 }
 
@@ -133,6 +160,7 @@ void connectMQTT() {
 
   while (!MQTTclient.connected()) {
 
+    Serial.println("");
     Serial.print("Connecting to MQTT...");
     Serial.print(ident);
     Serial.print("...");
@@ -179,6 +207,17 @@ void setup() {
 } 
 
 void loop() {
+
+  if (WiFi.status() != WL_CONNECTED) {
+
+      connectWifi();
+
+  }
+
+  if (!MQTTclient.connected()) {
+
+      connectMQTT();
+  }
 
   MQTTclient.loop();
 

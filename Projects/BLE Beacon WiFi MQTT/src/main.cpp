@@ -187,6 +187,18 @@ void setup() {
 
 void loop() {
 
+  while (WiFi.status() != WL_CONNECTED) {
+
+    connectWifi();
+
+  }
+
+  while (!MQTTclient.connected()) {
+
+      connectMQTT();
+
+  }
+
   MQTTclient.loop();
 
 }
