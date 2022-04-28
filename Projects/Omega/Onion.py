@@ -17,14 +17,17 @@ TERMINAL_LOC = "/loc/pos"
 # update to ommega onion
 MQTT_URL = "192.168.3.1"
 MQTT_PORT = 1883
-BROADCAST_INTERVAL = 10
-MEASURED_POWER = -40
+BROADCAST_INTERVAL = 5
+MEASURED_POWER = -40.0
+N = 3.0
+X_MAX = 6.0
+Y_MAX = 4.0
 CLIENT_LOCATION = {
     # x, y
     "34:AB:95:40:50:B0": [0,0],
-    "08:3A:F2:3F:B5:68": [0,4],
-    "08:3A:F2:3F:D7:8C": [6,0],
-    "08:3A:F2:3F:D3:48": [6,4]
+    "08:3A:F2:3F:B5:68": [0,Y_MAX],
+    "08:3A:F2:3F:D7:8C": [X_MAX,0],
+    "08:3A:F2:3F:D3:48": [X_MAX,Y_MAX]
 }
 
 RSSI_COMBOS = [[0,1,2], [0,1,3], [0,2,3], [1,2,3]]
@@ -83,13 +86,13 @@ def ask_for_rssi(client):
     # only send the location if we have one
     if xy is not None:
         # TODO: send the x,y to WT
-        xy[0] = int((xy[0]/6)*360)
-        xy[1] = int((xy[1]/4)*240)
+	xVal = xy[0]
+	yVal = xy[1]
 
         # by calling publish()
         payload = {}
-        payload['X'] = xy[0]
-        payload['Y'] = xy[1]
+        payload['X'] = int((xVal/X_MAX)*360)
+        payload['Y'] = int((yVal/Y_MAX)*240)
         payload['MAC'] = MAC_ADDR
         publish(client, TERMINAL_LOC, json.dumps(payload))
         print("XY >>>>>>>")
@@ -151,7 +154,6 @@ def calculate_location():
 
 
 def distance(rssi):
-    N = 3
     distance = 10 ** ((MEASURED_POWER - rssi) / (10 * N))
     return distance
 
