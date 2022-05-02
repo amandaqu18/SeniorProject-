@@ -86,8 +86,8 @@ def ask_for_rssi(client):
     # only send the location if we have one
     if xy is not None:
         # TODO: send the x,y to WT
-	xVal = xy[0]
-	yVal = xy[1]
+        xVal = xy[0]
+        yVal = xy[1]
 
         # by calling publish()
         payload = {}
@@ -125,6 +125,10 @@ def calculate_location():
         r = distance(rssi_values[client_id])
 
         locations.append([x,y,r])
+        print[x]
+        print[y]
+        print[r]
+        print("----------")
 
     if len(rssi_values) == 3:
         print("3 values")
