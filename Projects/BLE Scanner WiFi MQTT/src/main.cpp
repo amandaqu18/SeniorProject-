@@ -90,28 +90,26 @@ void messageReceived(String topic, String payload) {
   //Initate the Scan 
 
   std::vector<int> RSSI_VALUES;
-  int length = 0;  
+  int length = 0;
   int sum = 0;
   int AVERAGE_RSSI = 0;
 
-  Serial.println("Starting BLE scan for 3 RSSI values...");
+  Serial.println("Starting BLE scan for 5 RSSI values...");
 
-  while(length < 3) {
+  while(length < 5) {
 
   BLEScanResults foundDevices = pBLEScan->start(scanTime, false); //Starting new scan
-  BLEAdvertisedDevice cur; 
  
     for (int i = 0; i < foundDevices.getCount(); i++) { //Cycle through all devices found
       
-       cur = foundDevices.getDevice(i); //Current device
+       BLEAdvertisedDevice cur = foundDevices.getDevice(i); //Current device
 
        if (cur.getAddress().equals(target)) {  //Compare current device adress to target address
 
             Serial.printf("Address: %s, RSSI: %d", cur.toString().c_str(), cur.getRSSI());
             Serial.println(); //Print out address, RSSI, and TXPower of found device
             RSSI_VALUES.push_back(cur.getRSSI());
-            length++ ; 
-
+            length++;
        } 
     } 
   }
